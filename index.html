@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Text Synchronization</title>
+    <style>
+        body {
+            font-family: fedra sans, sans-serif;
+            padding: 30px;
+            background-color: #ffffff;
+            color: black;
+            line-height: 1.8;
+        }
+
+        h1 {
+            text-align: center;
+            color: #D81B60;
+            text-shadow: #858383 1px 1px 3px;
+            margin: 0 auto 20px auto;
+            /* Center horizontally using auto margins */
+            border-radius: 4px;
+            box-shadow: #898989 2px 2px 5px;
+            padding: 10px px;
+            background-color: #ffffff;
+            display: inline-block;
+            /* Makes the box wrap around the text */
+            position: relative;
+            left: 50%;
+            /* Position the h1 50% from the left */
+            transform: translateX(-50%);
+            /* Center it by shifting half its width */
+        }
+
+
+        .audio-text-pair {
+            display: block;
+            margin-bottom: 20px;
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        #specific-audio-text-pair {
+            margin-left: 50px;
+        }
+
+        .audio-text-pair button {
+            font-family: fedra sans, sans-serif;
+            display: inline-block;
+            margin-right: 10px;
+            padding: 5px 10px;
+            font-size: 18px;
+
+            color: #fff;
+            background-color: #000000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .audio-text-pair button:hover {
+            background-color: #ffffff;
+            color: #000000;
+            box-shadow: #000000 2px 2px 5px;
+        }
+
+        .text-container {
+            font-size: 20px;
+            display: inline;
+        }
+
+        span {
+            display: inline;
+            /* Inline ensures proper spacing without gaps */
+            margin-right: 0;
+            /* Ensures no unnecessary spacing */
+            padding: 3px;
+            /* No padding to prevent extra spacing */
+            border-radius: 2px;
+            transition: all 0.1s ease;
+            font-weight: inherit;
+            /* Neutralizes browser defaults */
+            background: none;
+            /* Neutralizes browser defaults */
+        }
+
+        span.highlight {
+            background-color: #ffffff;
+            box-shadow: #909090 1px 1px 0px;
+            color: #D81B60;
+            font-weight: bold;
+            transition: all 0.1s ease-in-out;
+            border-radius: 4px;
+            border: #D81B60 1px solid;
+        }
+
+        span.default {
+            background-color: transparent;
+            color: inherit;
+            /* Ensures compatibility with parent styles */
+            font-weight: normal;
+        }
+
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        #fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 10px 15px;
+            font-size: 16px;
+            background: #D81B60;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #fullscreen-btn:hover {
+            background-color: #fff;
+            color: #D81B60;
+            box-shadow: 2px 2px 5px #000;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="audio-text-pair" id="specific-audio-text-pair">
+        <button>Play</button>
+        <audio src="https://static.wixstatic.com/mp3/0c2583_e8b86fad0892499592caae2898198688.m4a"></audio>
+        <div class="text-container">
+            <span data-start="0.0" data-end="1.3" style="line-height: 1.8 !important;">L'eix de rotació</span>
+            <span data-start="1.3" data-end="2.5" style="line-height: 1.8 !important;">és un eix imaginari</span>
+            <span data-start="2.5" data-end="4.0" style="line-height: 1.8 !important;">que uneix el pol nord</span>
+            <span data-start="4.0" data-end="5.4" style="line-height: 1.8 !important;">amb el pol sud.</span>
+            <span data-start="5.6" data-end="7.1" style="line-height: 1.8 !important;">També s'anomena</span>
+            <span data-start="7.1" data-end="8.2" style="line-height: 1.8 !important;">eix polar.</span>
+        </div>
+    </div>
+
+
+    <div class="audio-text-pair" id="specific-audio-text-pair">
+        <button>Play</button>
+        <audio src="https://static.wixstatic.com/mp3/0c2583_c1417244368e42f6b157931b9c4c68cd.m4a"></audio>
+        <div class="text-container">
+            <span data-start="0.0" data-end="1.3" style="line-height: 1.8 !important;">L'eix de rotació</span>
+            <span data-start="1.3" data-end="2.8" style="line-height: 1.8 !important;">està inclinat.</span>
+            <span data-start="2.8" data-end="4.5" style="line-height: 1.8 !important;">Així els dos pols</span>
+            <span data-start="4.5" data-end="6.15" style="line-height: 1.8 !important;">reben els raigs de sol</span>
+            <span data-start="6.15" data-end="7.4" style="line-height: 1.8 !important;">alternativament.</span>
+        </div>
+    </div>
+
+
+
+    <button id="fullscreen-btn">Pantalla completa</button>
+
+
+
+
+
+    <!-- Additional pairs remain unchanged -->
+
+    <script>
+
+        const fullscreenBtn = document.getElementById("fullscreen-btn");
+
+        fullscreenBtn.addEventListener("click", () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch((err) => {
+                    alert(`Error attempting to enable fullscreen mode: ${err.message}`);
+                });
+                fullscreenBtn.textContent = "Minimitza ";
+            } else {
+                document.exitFullscreen().catch((err) => {
+                    alert(`Error attempting to exit fullscreen mode: ${err.message}`);
+                });
+                fullscreenBtn.textContent = "Pantalla completa";
+            }
+        });
+
+        // Optional: update button text on fullscreen change (in case user uses Esc key)
+        document.addEventListener("fullscreenchange", () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.textContent = "Pantalla completa";
+            }
+        });
+        // Reusable function to set up audio-text synchronization
+        function setupAudioTextPair(pair) {
+            const playButton = pair.querySelector("button");
+            const audio = pair.querySelector("audio");
+            const textContainer = pair.querySelector(".text-container");
+
+            playButton.addEventListener("click", () => {
+                if (audio.paused) {
+                    audio.play();
+                    playButton.textContent = "Pause";
+                } else {
+                    audio.pause();
+                    playButton.textContent = "Play";
+                }
+            });
+
+            audio.addEventListener("timeupdate", () => {
+                const currentTime = audio.currentTime;
+                console.log(`Current Audio Time: ${currentTime}`); // Logs the current audio time
+
+                textContainer.querySelectorAll("span").forEach((span) => {
+                    const start = parseFloat(span.dataset.start);
+                    const end = parseFloat(span.dataset.end);
+
+                    console.log(`Span Start: ${start}, Span End: ${end}`); // Logs the timing for each span
+
+                    if (currentTime >= start && currentTime <= end) {
+                        console.log(`Highlighting span: "${span.textContent}"`); // Logs when a span is being highlighted
+                        span.classList.add("highlight");
+                        span.classList.remove("default");
+                    } else {
+                        span.classList.remove("highlight");
+                        span.classList.add("default");
+                    }
+                });
+            });
+
+            audio.addEventListener("ended", () => {
+                playButton.textContent = "Play";
+                textContainer.querySelectorAll("span").forEach((span) => {
+                    span.classList.remove("highlight");
+                    span.classList.add("default");
+                });
+            });
+
+            audio.addEventListener("error", () => {
+                alert("Error: Unable to load or play the audio file.");
+            });
+        }
+
+
+        // Initialize all audio-text pairs
+        document.querySelectorAll("span").forEach((span) => {
+            const boldAndColoredWords = [
+                "L'eix de rotació",
+                "eix polar",
+            ]
+                ;
+            const coloredOnlyWords = ["eix imaginari", "inclinat"];
+
+            let text = span.textContent; // Preserve original text
+
+            // Combine all words into a single regex pattern for efficient matching
+            const wordsPattern = [...boldAndColoredWords, ...coloredOnlyWords].join("|");
+            const regex = new RegExp(`(${wordsPattern})`, "g");
+
+            // Replace all occurrences in a single pass
+            text = text.replace(regex, (match) => {
+                if (boldAndColoredWords.includes(match)) {
+                    return `<span style="font-weight: bold; color: #D81B60;">${match}</span>`;
+                } else if (coloredOnlyWords.includes(match)) {
+                    return `<span style="color: #D81B60;">${match}</span>`;
+                }
+                return match; // Fallback (shouldn't happen)
+            });
+
+            // Set final transformed HTML
+            span.innerHTML = text;
+        });
+
+
+
+        document.querySelectorAll(".audio-text-pair").forEach(setupAudioTextPair);
+
+
+    </script>
+
+
+
+
+</body>
+
+</html>
